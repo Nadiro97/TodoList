@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="description"
+        content="This is to do list By Neder Said ( CS50 Final Project )">
+
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>CS50 Final Project</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@200&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            background-color: #000000;
+            font-family: 'Nunito', sans-serif;
+            padding-top: 50px;
+        }
+
+        h1,h2,h3,h4,h5,h6{
+            font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif
+        }
+
+        a,
+        p {
+            color: #000000
+        }
+
+        a {
+            font-weight: 700;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background-color: #fff;
+            -webkit-box-shadow: 2px 2px 13px -4px rgba(0, 0, 0, 0.21);
+            box-shadow: 2px 2px 13px -4px rgba(0, 0, 0, 0.21);
+        }
+
+        input {
+            outline: none;
+            border: none;
+        }
+
+        .header-bar {
+            
+            justify-content: space-between;
+            color: #fff;
+            padding: 10px;
+            border-radius: 5px 5px 0 0;
+            background: linear-gradient(90deg, #02649c 0%, #012644 43%, #6795aa 100%);
+            text-align: center !important;
+        }
+
+        .header-bar a {
+            color: rgb(255, 0, 0);
+            text-decoration: none;
+        }
+        .header-bar a:hover {
+            color: #02bef7;
+        }
+
+        .task-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: #fff;
+            border-top: 2px solid #000000;
+            overflow: hidden;
+        }
+
+        .task-title {
+            display: flex;
+            padding: 30px;
+        }
+
+        .task-title a {
+            text-decoration: none;
+            color: #0389f7;
+            margin-left: 10px;
+        }
+
+        .task-complete-icon {
+            height: 20px;
+            width: 20px;
+            background-color: rgb(0, 94, 0);
+            border-radius: 50%;
+        }
+
+        .task-incomplete-icon {
+            height: 20px;
+            width: 20px;
+            background-color: rgb(247, 247, 247);
+            border-radius: 50%;
+        }
+
+        .delete-link {
+            text-decoration: none;
+            font-weight: 900;
+            color: #000000;
+            font-size: 22px;
+            line-height: 0;
+            padding: 20px 0px;
+        }
+
+        /*Handle Classes*/
+
+        .handle {
+            display: inline-block;
+            padding: 20px 16px;
+            cursor: grab;
+            user-select: none;
+        }
+
+        .handle:after,
+        .handle:before {
+            display: block;
+            content: "";
+        }
+
+        .handle:active,
+        .handle:active:before,
+        .handle:active:after {
+            cursor: grabbing;
+        }
+
+        .dropArea {
+            background-color: #f1f2f6;
+            color: black;
+            border: #ced6e0 1px solid;
+        }
+
+        .selectedTask {
+            opacity: 0.6;
+        }
+
+
+        #add-link {
+            color: #0250f7;
+            text-decoration: none;
+            font-size: 42px;
+            text-shadow: 1px 1px #000000;
+        }
+        #add-link:hover {
+            color: #077703;
+        }
+        #search-add-wrapper {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+        }
+
+        @media screen and (max-width:350px) {
+            #search-add-wrapper {
+                padding: 20px;
+            }
+        }
+
+        input[type=text],
+        input[type=password],
+        textarea {
+            border: 1px solid #757575;
+            border-radius: 5px;
+            padding: 10px;
+            width: 90%;
+        }
+
+        label {
+            padding-top: 10px !important;
+            display: block;
+        }
+
+        ::placeholder {
+            font-weight: 300;
+            opacity: 0.5;
+        }
+
+        .button {
+            border: 1px solid #000000;
+            background-color: #FFF;
+            color: #000000;
+            padding: 10px;
+            font-size: 14px;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .card-body {
+            padding: 20px;
+        }
+
+        .signature{
+            text-align: right;
+            padding-top: 25%;
+            color: #FFF;
+        }
+        .welcome{
+            text-align: center;
+            color: #ffffff;
+            font-weight: 600;
+            background-color: #000000;
+        }
+        canvas{
+            filter: blur(1px);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        {% block content %} {% endblock content %}
+    </div>
+    <canvas id="canvas"></canvas>
+    <div class="signature">
+        Made By Neder Said for Cs50 web dev Final test.
+    </div>
+<script>
+let c = init("canvas"),
+  w = (canvas.width = window.innerWidth),
+  h = (canvas.height = window.innerHeight);
+//initiation
+
+class firefly{
+  constructor(){
+    this.x = Math.random()*w;
+    this.y = Math.random()*h;
+    this.s = Math.random()*2;
+    this.ang = Math.random()*2*Math.PI;
+    this.v = this.s*this.s/4;
+  }
+  move(){
+    this.x += this.v*Math.cos(this.ang);
+    this.y += this.v*Math.sin(this.ang);
+    this.ang += Math.random()*20*Math.PI/180-10*Math.PI/180;
+  }
+  show(){
+    c.beginPath();
+    c.arc(this.x,this.y,this.s,0,2*Math.PI);
+    c.fillStyle="#fddba3";
+    c.fill();
+  }
+}
+
+let f = [];
+
+function draw() {
+  if(f.length < 100){
+    for(let j = 0; j < 10; j++){
+     f.push(new firefly());
+  }
+     }
+  //animation
+  for(let i = 0; i < f.length; i++){
+    f[i].move();
+    f[i].show();
+    if(f[i].x < 0 || f[i].x > w || f[i].y < 0 || f[i].y > h){
+       f.splice(i,1);
+       }
+  }
+}
+
+let mouse = {};
+let last_mouse = {};
+
+canvas.addEventListener(
+  "mousemove",
+  function(e) {
+    last_mouse.x = mouse.x;
+    last_mouse.y = mouse.y;
+
+    mouse.x = e.pageX - this.offsetLeft;
+    mouse.y = e.pageY - this.offsetTop;
+  },
+  false
+);
+function init(elemid) {
+  let canvas = document.getElementById(elemid),
+    c = canvas.getContext("2d"),
+    w = (canvas.width = window.innerWidth),
+    h = (canvas.height = window.innerHeight);
+  c.fillStyle = "rgba(30,30,30,1)";
+  c.fillRect(0, 0, w, h);
+  return c;
+}
+
+window.requestAnimFrame = (function() {
+  return (
+    window.requestAnimationFrame ||
+    window.webkitRequestAnimationFrame ||
+    window.mozRequestAnimationFrame ||
+    window.oRequestAnimationFrame ||
+    window.msRequestAnimationFrame ||
+    function(callback) {
+      window.setTimeout(callback);
+    }
+  );
+});
+
+function loop() {
+  window.requestAnimFrame(loop);
+  c.clearRect(0, 0, w, h);
+  draw();
+}
+
+window.addEventListener("resize", function() {
+  (w = canvas.width = window.innerWidth),
+  (h = canvas.height = window.innerHeight);
+  loop();
+});
+
+loop();
+setInterval(loop, 1000 / 60);
+    </script>
+</body>
+
+
+</html>
